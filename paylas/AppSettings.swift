@@ -16,6 +16,13 @@ enum AppSettings {
 
     static let borderColorKey = "paylas.borderColor"
     static let borderColorDefault = Color.blue
+
+    /// Comma-separated bundle identifiers of apps hidden from the stream.
+    static let excludedAppsKey = "paylas.excludedApps"
+
+    static var excludedAppIDs: Set<String> {
+        Set((UserDefaults.standard.string(forKey: excludedAppsKey) ?? "").split(separator: ",").map(String.init))
+    }
 }
 
 /// Lets @AppStorage persist a Color as "r,g,b,a" (sRGB).

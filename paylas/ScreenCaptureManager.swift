@@ -44,22 +44,25 @@ final class ScreenCaptureManager: NSObject {
         super.init()
     }
 
-    /// Finds the SCDisplay that corresponds to a given NSScreen by matching CGDirectDisplayID.
-    static func matchingDisplay(for screen: NSScreen) async throws -> SCDisplay {
+    /// Builds a filter for the display matching the given NSScreen (by CGDirectDisplayID).
+    /// Paylas itself (stream window, border, overlay) is always hidden, plus every
+    /// running app the user excluded in the settings.
+    static func contentFilter(for screen: NSScreen) async throws -> SCContentFilter {
         let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true)
         let screenNumber = (screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value
-        guard let match = content.displays.first(where: { $0.displayID == screenNumber }) else {
+        guard let display = content.displays.first(where: { $0.displayID == screenNumber }) else {
             throw ScreenCaptureError.displayNotFound
         }
-        return match
+        let excludedIDs = AppSettings.excludedAppIDs.union([Bundle.main.bundleIdentifier ?? ""])
+        // ponytail: only apps running at stream start are hidden; restart the stream after launching one.
+        let excludedApps = content.applications.filter { excludedIDs.contains($0.bundleIdentifier) }
+        return SCContentFilter(display: display, excludingApplications: excludedApps, exceptingWindows: [])
     }
 
     /// - Parameter cropRect: The capture region in points, in the display's own
     ///   top-left-origin coordinate space (not the global desktop space).
-    func start(display: SCDisplay, cropRect: CGRect, scale: CGFloat) async throws {
+    func start(filter: SCContentFilter, cropRect: CGRect, scale: CGFloat) async throws {
         stop()
-
-        let filter = SCContentFilter(display: display, excludingWindows: [])
 
         let configuration = SCStreamConfiguration()
         configuration.sourceRect = cropRect

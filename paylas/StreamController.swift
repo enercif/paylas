@@ -50,7 +50,7 @@ final class StreamController {
         startTask = Task { [weak self] in
             guard let self else { return }
             do {
-                let display = try await ScreenCaptureManager.matchingDisplay(for: screen)
+                let filter = try await ScreenCaptureManager.contentFilter(for: screen)
                 try Task.checkCancellation()
 
                 let title = "Paylas – \(Int(rect.width))×\(Int(rect.height))"
@@ -65,7 +65,7 @@ final class StreamController {
                 let captureManager = self.captureManager ?? ScreenCaptureManager(displayLayer: windowController.displayLayer)
                 self.captureManager = captureManager
                 try await captureManager.start(
-                    display: display,
+                    filter: filter,
                     cropRect: rect.flipped(inContainerHeight: screen.frame.height),
                     scale: screen.backingScaleFactor
                 )
