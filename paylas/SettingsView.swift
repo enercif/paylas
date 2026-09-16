@@ -40,6 +40,7 @@ struct SettingsView: View {
 
             Section("Tastenkürzel") {
                 KeyboardShortcuts.Recorder("Bereichsauswahl öffnen:", name: .sectionSelector)
+                KeyboardShortcuts.Recorder("Stream unscharf schalten:", name: .toggleBlur)
             }
         }
         .padding(20)

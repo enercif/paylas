@@ -41,4 +41,5 @@ extension Color: @retroactive RawRepresentable {
 
 extension KeyboardShortcuts.Name {
     static let sectionSelector = Self("sectionSelector", initial: .init(.two, modifiers: [.control, .option, .shift]))
+    static let toggleBlur = Self("toggleBlur", initial: .init(.b, modifiers: [.control, .option, .shift]))
 }

@@ -24,7 +24,7 @@ struct paylasApp: App {
 }
 
 private struct MenuContent: View {
-    let streamController: StreamController
+    @Bindable var streamController: StreamController
     @Environment(\.openSettings) private var openSettings
 
     var body: some View {
@@ -33,6 +33,8 @@ private struct MenuContent: View {
         }
 
         if streamController.isStreaming {
+            Toggle("Stream unscharf", isOn: $streamController.isBlurred)
+
             Button("Stream beenden") {
                 streamController.stopStream()
             }

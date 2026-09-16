@@ -24,9 +24,17 @@ final class StreamController {
 
     var isStreaming: Bool { windowController != nil }
 
+    var isBlurred = false {
+        didSet { windowController?.isBlurred = isBlurred }
+    }
+
     init() {
         KeyboardShortcuts.onKeyUp(for: .sectionSelector) { [weak self] in
             self?.startSectionSelector()
+        }
+        KeyboardShortcuts.onKeyUp(for: .toggleBlur) { [weak self] in
+            guard let self, self.isStreaming else { return }
+            self.isBlurred.toggle()
         }
     }
 
@@ -57,6 +65,10 @@ final class StreamController {
                 let windowController = self.windowController ?? StreamWindowController(title: title, contentSize: rect.size)
                 windowController.window?.title = title
                 windowController.window?.setContentSize(rect.size)
+                windowController.isBlurred = self.isBlurred
+                windowController.onToggleBlur = { [weak self] in
+                    self?.isBlurred.toggle()
+                }
                 windowController.onWindowClosed = { [weak self] in
                     self?.tearDown()
                 }
@@ -89,6 +101,7 @@ final class StreamController {
         captureManager?.stop()
         captureManager = nil
         windowController = nil
+        isBlurred = false
         borderWindow?.close()
         borderWindow = nil
     }
