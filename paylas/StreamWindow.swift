@@ -23,6 +23,7 @@ final class StreamWindowController: NSWindowController, NSWindowDelegate {
         window.title = title
         window.isReleasedWhenClosed = false
         window.minSize = NSSize(width: 120, height: 80)
+        window.level = .floating // always on top
 
         // Keep the native resize/move/close behavior of a titled window, but hide
         // every visible trace of the title bar so only the stream content shows.

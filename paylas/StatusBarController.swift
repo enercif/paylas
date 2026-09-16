@@ -14,6 +14,7 @@ final class StatusBarController: NSObject {
     private let statusItem: NSStatusItem
     private var windowController: StreamWindowController?
     private var captureManager: ScreenCaptureManager?
+    private var borderWindow: StreamBorderWindow?
     private let overlay = SectionSelectorOverlay()
     private let settingsScene = NSHostingSceneRepresentation {
         Settings {
@@ -70,6 +71,11 @@ final class StatusBarController: NSObject {
                 try await captureManager.start(display: display, cropRect: topLeftOriginRect, scale: screen.backingScaleFactor)
                 self.captureManager = captureManager
                 windowController.showWindow(nil)
+
+                self.borderWindow?.close()
+                let borderWindow = StreamBorderWindow(rect: rect, screen: screen)
+                borderWindow.orderFrontRegardless()
+                self.borderWindow = borderWindow
             } catch {
                 NSLog("Paylas: Stream konnte nicht gestartet werden: \(error.localizedDescription)")
                 self.presentCaptureError(error)
@@ -81,6 +87,8 @@ final class StatusBarController: NSObject {
         captureManager?.stop()
         captureManager = nil
         windowController = nil
+        borderWindow?.close()
+        borderWindow = nil
     }
 
     private func presentCaptureError(_ error: Error) {
