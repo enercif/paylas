@@ -25,17 +25,17 @@ final class StreamWindowController: NSWindowController, NSWindowDelegate {
         set { contentView.onToggleBlur = newValue }
     }
 
-    init(title: String, contentSize: CGSize) {
+    init(contentSize: CGSize) {
         let window = NSWindow(
             contentRect: NSRect(origin: .zero, size: contentSize),
             styleMask: [.titled, .closable, .resizable, .miniaturizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
-        window.title = title
+        window.title = "paylas"
         window.isReleasedWhenClosed = false
         window.minSize = NSSize(width: 120, height: 80)
-        window.level = .floating // always on top
+        // Normal level on purpose: Discord/Chromium window pickers only list layer-0 windows.
 
         // Keep the native resize/move/close behavior of a titled window, but hide
         // every visible trace of the title bar so only the stream content shows.

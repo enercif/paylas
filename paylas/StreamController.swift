@@ -61,9 +61,7 @@ final class StreamController {
                 let filter = try await ScreenCaptureManager.contentFilter(for: screen)
                 try Task.checkCancellation()
 
-                let title = "Paylas – \(Int(rect.width))×\(Int(rect.height))"
-                let windowController = self.windowController ?? StreamWindowController(title: title, contentSize: rect.size)
-                windowController.window?.title = title
+                let windowController = self.windowController ?? StreamWindowController(contentSize: rect.size)
                 windowController.window?.setContentSize(rect.size)
                 windowController.isBlurred = self.isBlurred
                 windowController.onToggleBlur = { [weak self] in
