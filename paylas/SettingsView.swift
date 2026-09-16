@@ -4,10 +4,10 @@
 //
 
 import SwiftUI
+import KeyboardShortcuts
 
 struct SettingsView: View {
     @AppStorage(AppSettings.showsCursorKey) private var showsCursor = true
-    @AppStorage(AppSettings.hotkeyEnabledKey) private var hotkeyEnabled = true
 
     var body: some View {
         Form {
@@ -16,13 +16,7 @@ struct SettingsView: View {
             }
 
             Section("Tastenkürzel") {
-                Toggle("Globales Tastenkürzel aktivieren", isOn: $hotkeyEnabled)
-                    .onChange(of: hotkeyEnabled) { _, enabled in
-                        HotkeyManager.shared.setEnabled(enabled)
-                    }
-                Text("⌃⌥⇧2 öffnet den Section-Selector")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                KeyboardShortcuts.Recorder("Section-Selector öffnen:", name: .sectionSelector)
             }
         }
         .padding(20)

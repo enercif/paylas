@@ -4,6 +4,7 @@
 //
 
 import AppKit
+import KeyboardShortcuts
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusBarController: StatusBarController?
@@ -12,11 +13,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         AppSettings.registerDefaults()
         NSApp.setActivationPolicy(.accessory)
 
-        let controller = StatusBarController()
-        statusBarController = controller
+        statusBarController = StatusBarController()
 
-        HotkeyManager.shared.start { [weak controller] in
-            controller?.startSectionSelector()
+        KeyboardShortcuts.onKeyUp(for: .sectionSelector) { [weak statusBarController] in
+            statusBarController?.startSectionSelector()
         }
     }
 

@@ -3,16 +3,19 @@
 //  paylas
 //
 
-import Foundation
+import AppKit
+import KeyboardShortcuts
 
 enum AppSettings {
     static let showsCursorKey = "paylas.showsCursor"
-    static let hotkeyEnabledKey = "paylas.hotkeyEnabled"
 
     static func registerDefaults() {
         UserDefaults.standard.register(defaults: [
-            showsCursorKey: true,
-            hotkeyEnabledKey: true
+            showsCursorKey: true
         ])
     }
+}
+
+extension KeyboardShortcuts.Name {
+    static let sectionSelector = Self("sectionSelector", default: .init(.two, modifiers: [.control, .option, .shift]))
 }

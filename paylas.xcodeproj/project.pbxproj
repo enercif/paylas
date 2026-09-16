@@ -6,6 +6,10 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		8CDCA4C3305AB136002E87F2 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 8CDCA4C2305AB136002E87F2 /* KeyboardShortcuts */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		8CBF8CDD3059F60600041D71 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -51,6 +55,7 @@
 		8CBF8CCC3059F60300041D71 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				8CDCA4C3305AB136002E87F2 /* KeyboardShortcuts in Frameworks */,
 			);
 		};
 		8CBF8CD93059F60600041D71 /* Frameworks */ = {
@@ -103,6 +108,9 @@
 				8CBF8CD13059F60300041D71 /* paylas */,
 			);
 			name = paylas;
+			packageProductDependencies = (
+				8CDCA4C2305AB136002E87F2 /* KeyboardShortcuts */,
+			);
 			productName = paylas;
 			productReference = 8CBF8CCF3059F60300041D71 /* paylas.app */;
 			productType = "com.apple.product-type.application";
@@ -181,6 +189,9 @@
 			);
 			mainGroup = 8CBF8CC63059F60300041D71;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				8CDCA4C1305AB136002E87F2 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 8CBF8CD03059F60300041D71 /* Products */;
 			projectDirPath = "";
@@ -545,6 +556,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8CDCA4C1305AB136002E87F2 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8CDCA4C2305AB136002E87F2 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8CDCA4C1305AB136002E87F2 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8CBF8CC73059F60300041D71 /* Project object */;
 	validationLevel = 1;
