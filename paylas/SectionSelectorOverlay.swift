@@ -7,6 +7,7 @@
 //
 
 import AppKit
+import Carbon.HIToolbox
 
 final class SectionSelectorOverlay {
     private var window: SectionSelectorWindow?
@@ -94,7 +95,7 @@ final class SectionSelectorView: NSView {
     }
 
     override func keyDown(with event: NSEvent) {
-        if event.keyCode == 53 { // Escape
+        if event.keyCode == kVK_Escape {
             onCancel?()
         } else {
             super.keyDown(with: event)

@@ -58,10 +58,9 @@ final class StreamContentView: NSView {
     init(displayLayer: AVSampleBufferDisplayLayer) {
         self.displayLayer = displayLayer
         super.init(frame: .zero)
-        wantsLayer = true
+        wantsLayer = true // backed by displayLayer, see makeBackingLayer()
         displayLayer.videoGravity = .resizeAspect
         displayLayer.backgroundColor = NSColor.black.cgColor
-        layer?.addSublayer(displayLayer)
 
         let symbolConfig = NSImage.SymbolConfiguration(pointSize: 20, weight: .regular)
             .applying(.init(paletteColors: [.white, NSColor.black.withAlphaComponent(0.6)]))
@@ -71,8 +70,6 @@ final class StreamContentView: NSView {
         closeButton.target = self
         closeButton.action = #selector(closeWindow)
         closeButton.isHidden = true
-        closeButton.wantsLayer = true
-        closeButton.layer?.zPosition = 1 // above displayLayer
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         addSubview(closeButton)
         NSLayoutConstraint.activate([
@@ -100,8 +97,7 @@ final class StreamContentView: NSView {
         window?.close()
     }
 
-    override func layout() {
-        super.layout()
-        displayLayer.frame = bounds
+    override func makeBackingLayer() -> CALayer {
+        displayLayer
     }
 }

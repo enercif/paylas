@@ -33,8 +33,8 @@ final class StreamBorderWindow: NSWindow {
 
 private struct StreamBorderView: View {
     let lineWidth: CGFloat
-    @AppStorage(AppSettings.showsBorderKey) private var showsBorder = true
-    @AppStorage(AppSettings.borderColorKey) private var borderColor = Color.blue
+    @AppStorage(AppSettings.showsBorderKey) private var showsBorder = AppSettings.showsBorderDefault
+    @AppStorage(AppSettings.borderColorKey) private var borderColor = AppSettings.borderColorDefault
 
     var body: some View {
         if showsBorder {

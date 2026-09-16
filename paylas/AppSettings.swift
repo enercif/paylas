@@ -9,15 +9,13 @@ import KeyboardShortcuts
 
 enum AppSettings {
     static let showsCursorKey = "paylas.showsCursor"
-    static let showsBorderKey = "paylas.showsBorder"
-    static let borderColorKey = "paylas.borderColor"
+    static let showsCursorDefault = true
 
-    static func registerDefaults() {
-        UserDefaults.standard.register(defaults: [
-            showsCursorKey: true,
-            showsBorderKey: true
-        ])
-    }
+    static let showsBorderKey = "paylas.showsBorder"
+    static let showsBorderDefault = true
+
+    static let borderColorKey = "paylas.borderColor"
+    static let borderColorDefault = Color.blue
 }
 
 /// Lets @AppStorage persist a Color as "r,g,b,a" (sRGB).
@@ -35,5 +33,5 @@ extension Color: @retroactive RawRepresentable {
 }
 
 extension KeyboardShortcuts.Name {
-    static let sectionSelector = Self("sectionSelector", default: .init(.two, modifiers: [.control, .option, .shift]))
+    static let sectionSelector = Self("sectionSelector", initial: .init(.two, modifiers: [.control, .option, .shift]))
 }

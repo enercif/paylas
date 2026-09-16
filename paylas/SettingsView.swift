@@ -7,9 +7,9 @@ import SwiftUI
 import KeyboardShortcuts
 
 struct SettingsView: View {
-    @AppStorage(AppSettings.showsCursorKey) private var showsCursor = true
-    @AppStorage(AppSettings.showsBorderKey) private var showsBorder = true
-    @AppStorage(AppSettings.borderColorKey) private var borderColor = Color.blue
+    @AppStorage(AppSettings.showsCursorKey) private var showsCursor = AppSettings.showsCursorDefault
+    @AppStorage(AppSettings.showsBorderKey) private var showsBorder = AppSettings.showsBorderDefault
+    @AppStorage(AppSettings.borderColorKey) private var borderColor = AppSettings.borderColorDefault
 
     var body: some View {
         Form {
@@ -24,7 +24,7 @@ struct SettingsView: View {
             }
 
             Section("Tastenkürzel") {
-                KeyboardShortcuts.Recorder("Section-Selector öffnen:", name: .sectionSelector)
+                KeyboardShortcuts.Recorder("Bereichsauswahl öffnen:", name: .sectionSelector)
             }
         }
         .padding(20)
