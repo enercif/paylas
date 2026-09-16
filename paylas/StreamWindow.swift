@@ -26,7 +26,8 @@ final class StreamWindowController: NSWindowController, NSWindowDelegate {
 
         // Keep the native resize/move/close behavior of a titled window, but hide
         // every visible trace of the title bar so only the stream content shows.
-        // The traffic-light buttons only reappear while the window is key/active.
+        // The traffic-light buttons stay hidden; StreamContentView shows its own
+        // close button on hover instead.
         window.titlebarAppearsTransparent = true
         window.titleVisibility = .hidden
         window.isMovableByWindowBackground = true
@@ -35,25 +36,13 @@ final class StreamWindowController: NSWindowController, NSWindowDelegate {
 
         window.contentView = StreamContentView(displayLayer: displayLayer)
         window.delegate = self
-        setWindowButtons(hidden: true)
+        for type: NSWindow.ButtonType in [.closeButton, .miniaturizeButton, .zoomButton] {
+            window.standardWindowButton(type)?.isHidden = true
+        }
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-
-    private func setWindowButtons(hidden: Bool) {
-        window?.standardWindowButton(.closeButton)?.isHidden = hidden
-        window?.standardWindowButton(.miniaturizeButton)?.isHidden = hidden
-        window?.standardWindowButton(.zoomButton)?.isHidden = hidden
-    }
-
-    func windowDidBecomeKey(_ notification: Notification) {
-        setWindowButtons(hidden: false)
-    }
-
-    func windowDidResignKey(_ notification: Notification) {
-        setWindowButtons(hidden: true)
     }
 
     func windowWillClose(_ notification: Notification) {
@@ -63,6 +52,7 @@ final class StreamWindowController: NSWindowController, NSWindowDelegate {
 
 final class StreamContentView: NSView {
     private let displayLayer: AVSampleBufferDisplayLayer
+    private let closeButton = NSButton()
 
     init(displayLayer: AVSampleBufferDisplayLayer) {
         self.displayLayer = displayLayer
@@ -71,10 +61,42 @@ final class StreamContentView: NSView {
         displayLayer.videoGravity = .resizeAspect
         displayLayer.backgroundColor = NSColor.black.cgColor
         layer?.addSublayer(displayLayer)
+
+        let symbolConfig = NSImage.SymbolConfiguration(pointSize: 20, weight: .regular)
+            .applying(.init(paletteColors: [.white, NSColor.black.withAlphaComponent(0.6)]))
+        closeButton.image = NSImage(systemSymbolName: "xmark.circle.fill", accessibilityDescription: "Stream schließen")?
+            .withSymbolConfiguration(symbolConfig)
+        closeButton.isBordered = false
+        closeButton.target = self
+        closeButton.action = #selector(closeWindow)
+        closeButton.isHidden = true
+        closeButton.wantsLayer = true
+        closeButton.layer?.zPosition = 1 // above displayLayer
+        closeButton.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(closeButton)
+        NSLayoutConstraint.activate([
+            closeButton.topAnchor.constraint(equalTo: topAnchor, constant: 8),
+            closeButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8)
+        ])
+
+        // .activeAlways: Paylas is a menu bar app, so the window is usually not key.
+        addTrackingArea(NSTrackingArea(rect: .zero, options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect], owner: self))
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        closeButton.isHidden = false
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        closeButton.isHidden = true
+    }
+
+    @objc private func closeWindow() {
+        window?.close()
     }
 
     override func layout() {

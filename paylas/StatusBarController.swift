@@ -2,8 +2,9 @@
 //  StatusBarController.swift
 //  paylas
 //
-//  Owns the NSStatusItem, builds its menu on demand, and orchestrates
-//  starting/stopping section streams.
+//  Owns the NSStatusItem, builds its menu on demand, and orchestrates the
+//  single section stream. A new selection replaces the running stream and
+//  reuses its window.
 //
 
 import AppKit
@@ -11,7 +12,8 @@ import SwiftUI
 
 final class StatusBarController: NSObject {
     private let statusItem: NSStatusItem
-    private let streamManager = StreamManager()
+    private var windowController: StreamWindowController?
+    private var captureManager: ScreenCaptureManager?
     private let overlay = SectionSelectorOverlay()
     private let settingsScene = NSHostingSceneRepresentation {
         Settings {
@@ -52,28 +54,33 @@ final class StatusBarController: NSObject {
                     height: rect.height
                 )
 
-                let windowController = StreamWindowController(
-                    title: "Paylas – \(Int(rect.width))×\(Int(rect.height))",
-                    contentSize: rect.size
-                )
+                self.captureManager?.stop()
+                self.captureManager = nil
+
+                let title = "Paylas – \(Int(rect.width))×\(Int(rect.height))"
+                let windowController = self.windowController ?? StreamWindowController(title: title, contentSize: rect.size)
+                windowController.window?.title = title
+                windowController.window?.setContentSize(rect.size)
+                windowController.onWindowClosed = { [weak self] in
+                    self?.stopStream()
+                }
+                self.windowController = windowController
+
                 let captureManager = ScreenCaptureManager(displayLayer: windowController.displayLayer)
                 try await captureManager.start(display: display, cropRect: topLeftOriginRect, scale: screen.backingScaleFactor)
-
-                let session = StreamSession(
-                    title: windowController.window?.title ?? "Stream",
-                    captureManager: captureManager,
-                    windowController: windowController
-                )
-                windowController.onWindowClosed = { [weak self] in
-                    self?.streamManager.removeSession(id: session.id)
-                }
-                self.streamManager.addSession(session)
+                self.captureManager = captureManager
                 windowController.showWindow(nil)
             } catch {
                 NSLog("Paylas: Stream konnte nicht gestartet werden: \(error.localizedDescription)")
                 self.presentCaptureError(error)
             }
         }
+    }
+
+    private func stopStream() {
+        captureManager?.stop()
+        captureManager = nil
+        windowController = nil
     }
 
     private func presentCaptureError(_ error: Error) {
@@ -98,22 +105,10 @@ extension StatusBarController: NSMenuDelegate {
         selectItem.target = self
         menu.addItem(selectItem)
 
-        if !streamManager.sessions.isEmpty {
-            menu.addItem(.separator())
-            let headerItem = NSMenuItem(title: "Aktive Streams", action: nil, keyEquivalent: "")
-            headerItem.isEnabled = false
-            menu.addItem(headerItem)
-
-            for session in streamManager.sessions {
-                let item = NSMenuItem(title: session.title, action: nil, keyEquivalent: "")
-                let submenu = NSMenu()
-                let stopItem = NSMenuItem(title: "Beenden", action: #selector(stopSession(_:)), keyEquivalent: "")
-                stopItem.target = self
-                stopItem.representedObject = session.id
-                submenu.addItem(stopItem)
-                item.submenu = submenu
-                menu.addItem(item)
-            }
+        if captureManager != nil {
+            let stopItem = NSMenuItem(title: "Stream beenden", action: #selector(closeStream), keyEquivalent: "")
+            stopItem.target = self
+            menu.addItem(stopItem)
         }
 
         menu.addItem(.separator())
@@ -131,9 +126,8 @@ extension StatusBarController: NSMenuDelegate {
         startSectionSelector()
     }
 
-    @objc private func stopSession(_ sender: NSMenuItem) {
-        guard let id = sender.representedObject as? UUID else { return }
-        streamManager.stopSession(id: id)
+    @objc private func closeStream() {
+        windowController?.close()
     }
 
     @objc private func openSettings() {
